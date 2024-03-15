@@ -1,0 +1,80 @@
+import Link from 'next/link';
+
+type NavItem = {
+  icon: React.ReactNode;
+  title: string;
+};
+
+export type NavState = 'General' | 'Token' | 'Schema';
+
+const SettingItem = ({
+  icon,
+  title,
+  selected,
+  onClick,
+}: NavItem & { selected: boolean; onClick: () => void }) => {
+  return (
+    <div className="flex  flex-row justify-start">
+      <div className={`flex  w-[250px] flex-col justify-start bg-transparent text-base`}>
+        <nav className="grid gap-2 pr-2">
+          <div
+            onClick={onClick}
+            className={`${selected ? 'bg-gray-800' : 'bg-transparent'} flex cursor-pointer flex-row justify-start gap-3 rounded p-1 font-semibold text-white hover:bg-yellow-800`}
+          >
+            <div className={` w-[3px] ${selected ? 'bg-yellow-900' : 'bg-transparent'}`} />
+            <div>{icon}</div>
+            <div>{title}</div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  );
+};
+
+const NavItems: NavItem[] = [
+  {
+    icon: <span>🔒</span>,
+    title: 'General',
+  },
+  {
+    icon: <span>🔑</span>,
+    title: 'Token',
+  },
+  {
+    icon: <span>📦</span>,
+    title: 'Schema',
+  },
+];
+
+type SettingLayoutProps = {
+  children: React.ReactNode;
+  selectedTab: NavState;
+  setSelectedTab: (tab: NavState) => void;
+};
+
+export const SettingLayout = ({ children, selectedTab, setSelectedTab }: SettingLayoutProps) => {
+  const handleTabClick = (tab: NavState) => {
+    setSelectedTab(tab);
+  };
+
+  return (
+    <div className="flex w-full flex-row">
+      <div className="flex w-[250px] flex-col justify-start bg-transparent text-base">
+        <nav className="grid gap-2 pr-2">
+          {NavItems.map(link => (
+            <SettingItem
+              key={link.title}
+              icon={link.icon}
+              title={link.title}
+              selected={selectedTab === link.title}
+              onClick={() => handleTabClick(link.title as NavState)}
+            />
+          ))}
+        </nav>
+      </div>
+      <div className="ml-7 flex w-full flex-col justify-start bg-transparent text-white">
+        {children}
+      </div>
+    </div>
+  );
+};
