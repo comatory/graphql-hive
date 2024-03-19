@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 type NavItem = {
   icon: React.ReactNode;
   title: string;
@@ -21,7 +19,7 @@ const SettingItem = ({
             onClick={onClick}
             className={`${selected ? 'bg-gray-800' : 'bg-transparent'} flex cursor-pointer flex-row justify-start gap-3 rounded p-1 font-semibold text-white hover:bg-yellow-800`}
           >
-            <div className={` w-[3px] ${selected ? 'bg-yellow-900' : 'bg-transparent'}`} />
+            <div className={`w-[3px] ${selected ? 'bg-yellow-900' : 'bg-transparent'}`} />
             <div>{icon}</div>
             <div>{title}</div>
           </div>
