@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 type NavItem = {
   icon: React.ReactNode;
   title: string;
@@ -17,9 +19,12 @@ const SettingItem = ({
         <nav className="grid gap-2 pr-2">
           <div
             onClick={onClick}
-            className={`${selected ? 'bg-gray-800' : 'bg-transparent'} flex cursor-pointer flex-row justify-start gap-3 rounded p-1 font-semibold text-white hover:bg-yellow-800`}
+            className={cn(
+              'flex cursor-pointer flex-row justify-start gap-3 rounded p-1 font-semibold text-white hover:bg-yellow-800',
+              selected ? 'bg-gray-800' : 'bg-transparent',
+            )}
           >
-            <div className={`w-[3px] ${selected ? 'bg-yellow-900' : 'bg-transparent'}`} />
+            <div className={cn('w-[3px]', selected ? 'bg-yellow-900' : 'bg-transparent')} />
             <div>{icon}</div>
             <div>{title}</div>
           </div>
