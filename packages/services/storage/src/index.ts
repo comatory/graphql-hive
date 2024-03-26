@@ -77,7 +77,7 @@ export type { Interceptor };
 export { ConnectionError } from 'slonik';
 export { createConnectionString } from './db/utils';
 export { createTokenStorage } from './tokens';
-export type { tokens, schema_policy_resource } from './db/types';
+export type { tokens, schema_policy_resource, billing_provider } from './db/types';
 
 type Connection = DatabasePool | DatabaseTransactionConnection;
 
@@ -481,7 +481,8 @@ export async function createStorage(
     return {
       organizationId: orgBilling.organization_id,
       externalBillingReference: orgBilling.external_billing_reference_id,
-      billingEmailAddress: orgBilling.billing_email_address,
+      provider: orgBilling.provider,
+      billingDayOfMonth: orgBilling.payment_day_of_month,
     };
   }
 
@@ -3262,17 +3263,18 @@ export async function createStorage(
       );
     },
     async createOrganizationBilling({
-      billingEmailAddress,
       organizationId,
       externalBillingReference,
+      provider,
+      billingDayOfMonth,
     }) {
       return transformOrganizationBilling(
         await pool.one<Slonik<organizations_billing>>(
           sql`/* createOrganizationBilling */
             INSERT INTO organizations_billing
-              ("organization_id", "external_billing_reference_id", "billing_email_address")
+              ("organization_id", "external_billing_reference_id", "provider", "payment_day_of_month")
             VALUES
-              (${organizationId}, ${externalBillingReference}, ${billingEmailAddress || null})
+              (${organizationId}, ${externalBillingReference}, ${provider}, ${billingDayOfMonth || null})
             RETURNING *
           `,
         ),

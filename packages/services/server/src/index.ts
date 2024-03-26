@@ -11,8 +11,16 @@ import cors from '@fastify/cors';
 import type { FastifyCorsOptionsDelegateCallback } from '@fastify/cors';
 import 'reflect-metadata';
 import { hostname } from 'os';
+import fastifyRawBody from 'fastify-raw-body';
 import formDataPlugin from '@fastify/formbody';
-import { createRegistry, createTaskRunner, CryptoProvider, LogFn, Logger } from '@hive/api';
+import {
+  createRegistry,
+  createTaskRunner,
+  CryptoProvider,
+  LogFn,
+  Logger,
+  PaddleBillingProvider,
+} from '@hive/api';
 import { createArtifactRequestHandler } from '@hive/cdn-script/artifact-handler';
 import { ArtifactStorageReader } from '@hive/cdn-script/artifact-storage-reader';
 import { AwsClient } from '@hive/cdn-script/aws';
@@ -99,6 +107,14 @@ export async function main() {
       level: env.log.level,
       requests: env.log.requests,
     },
+  });
+
+  await server.register(fastifyRawBody, {
+    field: 'rawBody',
+    global: false,
+    runFirst: true,
+    routes: [],
+    jsonContentTypes: [],
   });
 
   if (tracing) {
@@ -290,7 +306,12 @@ export async function main() {
         endpoint: env.hiveServices.tokens.endpoint,
       },
       billing: {
-        endpoint: env.hiveServices.billing ? env.hiveServices.billing.endpoint : null,
+        stripeServiceEndpoint: env.hiveServices.billing?.stripeEndpoint
+          ? env.hiveServices.billing.stripeEndpoint
+          : null,
+        paddleServiceEndpoint: env.hiveServices.billing?.paddleEndpoint
+          ? env.hiveServices.billing.paddleEndpoint
+          : null,
       },
       emailsEndpoint: env.hiveServices.emails ? env.hiveServices.emails.endpoint : undefined,
       webhooks: {
@@ -526,6 +547,47 @@ export async function main() {
 
     if (env.prometheus) {
       await startMetrics(env.prometheus.labels.instance, env.prometheus.port);
+    }
+
+    if (env.hiveServices.billing?.paddleEndpoint) {
+      server.route({
+        method: ['POST'],
+        url: '/paddle/webhook',
+        config: {
+          rawBody: true,
+        },
+        async handler(req, reply) {
+          const signature = (req.headers['paddle-signature'] as string) || null;
+          logger.info(
+            `Received Paddle webhook event. signature="${signature}", body=%o`,
+            req.rawBody,
+          );
+
+          if (!signature || !req.rawBody) {
+            return reply.status(400).send('Bad Request');
+          }
+
+          try {
+            await registry.injector
+              .get(PaddleBillingProvider)
+              .handleWebhookEvent(signature, String(req.rawBody));
+
+            return reply.status(200).send('OK');
+          } catch (e) {
+            logger.error('Failed to handle Paddle webhhook: %o', e);
+
+            captureException(e, {
+              level: 'error',
+              tags: {
+                'paddle.webhook': 'failed',
+                'webhook.body': String(req.rawBody),
+              },
+            });
+
+            return reply.status(500).send('Internal Server Error');
+          }
+        },
+      });
     }
 
     await server.listen({

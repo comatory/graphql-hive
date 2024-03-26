@@ -97,9 +97,8 @@ const config: CodegenConfig = {
           AdminGeneralStats: '../shared/mappers#AdminStats as AdminGeneralStatsMapper',
           AdminOrganizationStats:
             '../shared/entities#AdminOrganizationStats as AdminOrganizationStatsMapper',
-          BillingPaymentMethod: 'StripeTypes.PaymentMethod.Card',
-          BillingDetails: 'StripeTypes.PaymentMethod.BillingDetails',
-          BillingInvoice: 'StripeTypes.Invoice | StripeTypes.UpcomingInvoice',
+          BillingInvoice:
+            '../modules/billing/providers/base-provider#BillingInvoice as BillingInvoiceMapper',
           OrganizationGetStarted:
             '../shared/entities#OrganizationGetStarted as OrganizationGetStartedMapper',
           SchemaExplorer: '../shared/mappers#SchemaExplorerMapper',

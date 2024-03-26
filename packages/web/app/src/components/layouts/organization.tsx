@@ -13,9 +13,10 @@ import {
   OrganizationAccessScope,
   useOrganizationAccess,
 } from '@/lib/access/organization';
-import { getIsStripeEnabled } from '@/lib/billing/stripe-public-key';
+import { getIsPaddleEnabled } from '@/lib/billing/paddle-public-key';
 import { useRouteSelector, useToggle } from '@/lib/hooks';
 import { useLastVisitedOrganizationWriter } from '@/lib/last-visited-org';
+import { MigrateSubscriptionWarn } from '../organization/billing/MigrateSubscriptionWarn';
 import { ProPlanBilling } from '../organization/billing/ProPlanBillingWarm';
 import { RateLimitWarn } from '../organization/billing/RateLimitWarn';
 
@@ -39,6 +40,7 @@ const OrganizationLayout_CurrentOrganizationFragment = graphql(`
     ...ProPlanBilling_OrganizationFragment
     ...RateLimitWarn_OrganizationFragment
     ...UserMenu_CurrentOrganizationFragment
+    ...MigrateSubscriptionWarn_OrganizationFragment
   }
 `);
 
@@ -210,7 +212,7 @@ export function OrganizationLayout({
                       </NextLink>
                     </Tabs.Trigger>
                   )}
-                {getIsStripeEnabled() &&
+                {getIsPaddleEnabled() &&
                   canAccessOrganization(OrganizationAccessScope.Settings, meInCurrentOrg) && (
                     <Tabs.Trigger value={Page.Subscription} asChild>
                       <NextLink
@@ -250,6 +252,7 @@ export function OrganizationLayout({
           <>
             <ProPlanBilling organization={currentOrganization} />
             <RateLimitWarn organization={currentOrganization} />
+            <MigrateSubscriptionWarn organization={currentOrganization} />
           </>
         ) : null}
         <div className={className}>{children}</div>

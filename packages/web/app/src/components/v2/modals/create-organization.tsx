@@ -73,7 +73,7 @@ export const CreateOrganizationForm = () => {
         value={values.name}
         onChange={handleChange}
         onBlur={handleBlur}
-        disabled={isSubmitting}
+        disabled={isSubmitting || mutation.fetching}
         isInvalid={touched.name && !!errors.name}
         className="grow"
       />
@@ -91,9 +91,9 @@ export const CreateOrganizationForm = () => {
           size="large"
           block
           variant="primary"
-          disabled={isSubmitting || !isValid}
+          disabled={isSubmitting || mutation.fetching || !isValid}
         >
-          {isSubmitting ? (
+          {isSubmitting || mutation.fetching ? (
             <>
               <Spinner className="size-6 text-white" />
               <span className="ml-4">Creating...</span>

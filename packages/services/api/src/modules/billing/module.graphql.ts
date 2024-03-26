@@ -6,14 +6,29 @@ export default gql`
     billingConfiguration: BillingConfiguration!
   }
 
+  enum BillingProvider {
+    STRIPE
+    PADDLE
+    WIRE
+  }
+
   type BillingConfiguration {
+    provider: BillingProvider
     hasActiveSubscription: Boolean!
     canUpdateSubscription: Boolean!
     hasPaymentIssues: Boolean!
-    paymentMethod: BillingPaymentMethod
-    billingAddress: BillingDetails
     invoices: [BillingInvoice!]
     upcomingInvoice: BillingInvoice
+    taxId: String
+    legalName: String
+    billingEmail: String
+    paymentMethod: BillingPaymentMethod
+  }
+
+  type BillingPaymentMethod {
+    methodType: String!
+    brand: String
+    identifier: String
   }
 
   type BillingInvoice {
@@ -34,22 +49,6 @@ export default gql`
     UNCOLLECTIBLE
   }
 
-  type BillingPaymentMethod {
-    brand: String!
-    last4: String!
-    expMonth: Int!
-    expYear: Int!
-  }
-
-  type BillingDetails {
-    city: String
-    country: String
-    line1: String
-    line2: String
-    postalCode: String
-    state: String
-  }
-
   extend type Query {
     billingPlans: [BillingPlan!]!
   }
@@ -59,17 +58,15 @@ export default gql`
     planType: BillingPlanType!
     name: String!
     description: String
-    basePrice: Float
+    basePrice: BillingPlanPrice
     includedOperationsLimit: SafeInt
-    pricePerOperationsUnit: Float
-    rateLimit: UsageRateLimitType!
+    pricePerOperationsUnit: BillingPlanPrice
     retentionInDays: Int!
   }
 
-  enum UsageRateLimitType {
-    MONTHLY_QUOTA
-    MONTHLY_LIMITED
-    UNLIMITED
+  type BillingPlanPrice {
+    id: ID!
+    amount: Float!
   }
 
   enum BillingPlanType {
@@ -79,13 +76,22 @@ export default gql`
   }
 
   extend type Mutation {
-    generateStripePortalLink(selector: OrganizationSelectorInput!): String!
-    upgradeToPro(input: UpgradeToProInput!): ChangePlanResult!
+    generateSubscriptionManagementLink(selector: OrganizationSelectorInput!): String!
+      @deprecated(reason: "Migrating away from Stripe to Paddle. This will be removed soon.")
+    generatePaymentMethodUpdateToken(selector: OrganizationSelectorInput!): String!
     downgradeToHobby(input: DowngradeToHobbyInput!): ChangePlanResult!
     updateOrgRateLimit(
       selector: OrganizationSelectorInput!
       monthlyLimits: RateLimitInput!
     ): Organization!
+    updateBillingDetails(input: UpdateBillingDetailsInput!): Organization!
+  }
+
+  input UpdateBillingDetailsInput {
+    selector: OrganizationSelectorInput!
+    taxId: String
+    legalName: String
+    billingEmail: String
   }
 
   input DowngradeToHobbyInput {

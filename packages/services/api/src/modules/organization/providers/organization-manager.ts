@@ -385,12 +385,16 @@ export class OrganizationManager {
     });
 
     if (this.billingProvider.enabled) {
-      await this.billingProvider.syncOrganization({
-        organizationId: organization.id,
-        reserved: {
-          operations: Math.floor(input.monthlyRateLimit.operations / 1_000_000),
-        },
+      const billingRecord = await this.billingProvider.getOrganizationBillingParticipant({
+        organization: organization.id,
       });
+
+      if (billingRecord) {
+        await this.billingProvider.syncOrganization(
+          billingRecord,
+          Math.floor(input.monthlyRateLimit.operations / 1_000_000),
+        );
+      }
     }
 
     return result;
