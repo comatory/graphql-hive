@@ -15,9 +15,7 @@ const SettingItem = ({
 }: NavItem & { selected: boolean; onClick: () => void }) => {
   return (
     <div className="flex  flex-row justify-start">
-      <div
-        className="flex w-[100px] flex-col justify-start bg-transparent text-base md:w-[250px]"
-      >
+      <div className="flex w-[100px] flex-col justify-start bg-transparent text-base md:w-[250px]">
         <nav className="grid gap-2 pr-2">
           <div
             onClick={onClick}
