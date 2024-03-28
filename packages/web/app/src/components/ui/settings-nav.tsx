@@ -15,7 +15,7 @@ const SettingItem = ({
 }: NavItem & { selected: boolean; onClick: () => void }) => {
   return (
     <div className="flex  flex-row justify-start">
-      <div className={`flex  w-[250px] flex-col justify-start bg-transparent text-base`}>
+      <div className={`flex md:w-[250px] w-[100px] flex-col justify-start bg-transparent text-base`}>
         <nav className="grid gap-2 pr-2">
           <div
             onClick={onClick}
@@ -24,8 +24,7 @@ const SettingItem = ({
               selected ? 'bg-gray-800' : 'bg-transparent',
             )}
           >
-            <div className={cn('w-[3px]', selected ? 'bg-yellow-900' : 'bg-transparent')} />
-            <div>{icon}</div>
+            <div className='md:block hidden'>{icon}</div>
             <div>{title}</div>
           </div>
         </nav>
@@ -62,7 +61,7 @@ export const SettingLayout = ({ children, selectedTab, setSelectedTab }: Setting
 
   return (
     <div className="flex w-full flex-row">
-      <div className="flex w-[250px] flex-col justify-start bg-transparent text-base">
+      <div className="flex md:w-[250px] w-[100px] flex-col justify-start bg-transparent text-base">
         <nav className="grid gap-2 pr-2">
           {NavItems.map(link => (
             <SettingItem
