@@ -1911,7 +1911,7 @@ importers:
     devDependencies:
       '@graphql-hive/client':
         specifier: '*'
-        version: 0.30.0(graphql@16.8.1)
+        version: link:../packages/libraries/client/dist
 
 packages:
 
@@ -6147,37 +6147,6 @@ packages:
       - utf-8-validate
     dev: true
     patched: true
-
-  /@graphql-hive/client@0.30.0(graphql@16.8.1):
-    resolution: {integrity: sha512-c2StZM54bXBmfiGbnZr90txfYm7ypm1WMbYxSatPwMrtbeT4j5aK+S4duaeZ7VduJITUjjNUzWjqSh5wJ3hW9g==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      graphql: ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
-    dependencies:
-      '@graphql-hive/core': 0.2.4(graphql@16.8.1)
-      '@graphql-tools/utils': 10.1.2(graphql@16.8.1)
-      async-retry: 1.3.3
-      axios: 1.6.5
-      graphql: 16.8.1
-      tiny-lru: 8.0.2
-    optionalDependencies:
-      '@apollo/server': 4.10.1(graphql@16.8.1)
-      '@envelop/types': 5.0.0
-    transitivePeerDependencies:
-      - debug
-      - encoding
-      - supports-color
-    dev: true
-
-  /@graphql-hive/core@0.2.4(graphql@16.8.1):
-    resolution: {integrity: sha512-yCCEV9SxL6XriJB24jzxa00R2TvHczSVte3zRl3TWxk+2D7xpJvrC553175QZ0mqrayHqqDmhfO8FWcJPhLMmg==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      graphql: ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
-    dependencies:
-      graphql: 16.8.1
-      lodash.sortby: 4.7.0
-    dev: true
 
   /@graphql-inspector/audit-command@4.0.3(@graphql-inspector/config@4.0.2)(@graphql-inspector/loaders@4.0.3)(graphql@16.8.1)(yargs@17.7.2):
     resolution: {integrity: sha512-cm4EtieIp9PUSDBze+Sn5HHF80jDF9V7sYyXqFa7+Vtw4Jlet98Ig48dFVtoLuFCPtCv2eZ22I8JOkBKL5WgVA==}
