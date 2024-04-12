@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { get } from './internal/http-client.js';
 import type { SchemaFetcherOptions, ServicesFetcherOptions } from './internal/types.js';
 import { createHash, joinUrl } from './internal/utils.js';
 import { version } from './version.js';
@@ -46,39 +46,27 @@ function createFetcher(options: SchemaFetcherOptions & ServicesFetcherOptions) {
     };
 
     const fetchWithRetry = (): Promise<readonly Schema[] | Schema> => {
-      return axios
-        .get(endpoint, {
-          headers,
-          responseType: 'json',
-        })
-        .then(response => {
-          if (response.status >= 200 && response.status < 300) {
-            const result = response.data;
+      return get(endpoint, {
+        headers,
+      }).then(async response => {
+        if (response.ok) {
+          const result = await response.json();
 
-            const etag = response.headers['etag'];
-            if (etag) {
-              cached = result;
-              cacheETag = etag;
-            }
-
-            return result;
+          const etag = response.headers.get('etag');
+          if (etag) {
+            cached = result;
+            cacheETag = etag;
           }
 
-          return retry(response.status);
-        })
-        .catch(async error => {
-          if (axios.isAxiosError(error)) {
-            if (error.response?.status === 304 && cached !== null) {
-              return cached;
-            }
+          return result;
+        }
 
-            if (error.response?.status) {
-              return retry(error.response.status);
-            }
-          }
+        if (response.status === 304 && cached !== null) {
+          return cached;
+        }
 
-          throw error;
-        });
+        return retry(response.status);
+      });
     };
 
     return fetchWithRetry();

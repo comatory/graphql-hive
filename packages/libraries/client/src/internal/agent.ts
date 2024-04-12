@@ -1,7 +1,9 @@
 import retry from 'async-retry';
-import axios from 'axios';
 import { version } from '../version.js';
+import { post } from './http-client.js';
 import type { Logger } from './types.js';
+
+type ReadOnlyResponse = Pick<Response, 'status' | 'text' | 'json'>;
 
 export interface AgentOptions {
   enabled?: boolean;
@@ -42,17 +44,9 @@ export interface AgentOptions {
    * Custom logger (defaults to console)
    */
   logger?: Logger;
-  /**
-   * Define a custom http agent to be used when performing http requests
-   */
-  httpAgent?: any;
-  /**
-   * Define a custom https agent to be used when performing https requests
-   */
-  httpsAgent?: any;
 }
 
-export function createAgent<TEvent, TResult = void>(
+export function createAgent<TEvent>(
   pluginOptions: AgentOptions,
   {
     prefix,
@@ -80,8 +74,6 @@ export function createAgent<TEvent, TResult = void>(
     maxSize: 25,
     logger: console,
     name: 'hive-client',
-    httpAgent: undefined,
-    httpsAgent: undefined,
     ...pluginOptions,
   };
 
@@ -120,7 +112,7 @@ export function createAgent<TEvent, TResult = void>(
     }
   }
 
-  function sendImmediately(event: TEvent): Promise<TResult | null> {
+  function sendImmediately(event: TEvent): Promise<ReadOnlyResponse | null> {
     data.set(event);
 
     debugLog('Sending immediately');
@@ -130,15 +122,15 @@ export function createAgent<TEvent, TResult = void>(
   async function send<T>(sendOptions: {
     runOnce?: boolean;
     throwOnError: true;
-  }): Promise<T | null | never>;
+  }): Promise<ReadOnlyResponse | null>;
   async function send<T>(sendOptions: {
     runOnce?: boolean;
     throwOnError: false;
-  }): Promise<T | null>;
+  }): Promise<ReadOnlyResponse | null>;
   async function send<T>(sendOptions?: {
     runOnce?: boolean;
     throwOnError: boolean;
-  }): Promise<T | null | never> {
+  }): Promise<ReadOnlyResponse | null> {
     const runOnce = sendOptions?.runOnce ?? false;
 
     if (!data.size()) {
@@ -156,35 +148,32 @@ export function createAgent<TEvent, TResult = void>(
 
       const sendReport: retry.RetryFunction<{
         status: number;
-        data: T | null;
+        text(): Promise<string>;
+        json(): Promise<unknown>;
       }> = async (_bail, attempt) => {
         debugLog(`Sending (queue ${dataToSend}) (attempt ${attempt})`);
 
         if (!enabled) {
           return {
             status: 200,
-            data: null,
+            text: async () => 'OK',
+            json: async () => ({}),
           };
         }
 
-        const response = await axios
-          .post(options.endpoint, buffer, {
-            headers: {
-              accept: 'application/json',
-              'content-type': 'application/json',
-              Authorization: `Bearer ${options.token}`,
-              'User-Agent': `${options.name}/${version}`,
-              ...headers(),
-            },
-            responseType: 'json',
-            timeout: options.timeout,
-            httpAgent: options.httpAgent,
-            httpsAgent: options.httpsAgent,
-          })
-          .catch(error => {
-            debugLog(`Attempt ${attempt} failed: ${error.message}`);
-            return Promise.reject(error);
-          });
+        const response = await post(options.endpoint, buffer, {
+          headers: {
+            accept: 'application/json',
+            'content-type': 'application/json',
+            Authorization: `Bearer ${options.token}`,
+            'User-Agent': `${options.name}/${version}`,
+            ...headers(),
+          },
+          timeout: options.timeout,
+        }).catch(error => {
+          debugLog(`Attempt ${attempt} failed: ${error.message}`);
+          return Promise.reject(error);
+        });
 
         if (response.status >= 200 && response.status < 300) {
           return response;
@@ -202,7 +191,7 @@ export function createAgent<TEvent, TResult = void>(
 
       if (response.status < 200 || response.status >= 300) {
         throw new Error(
-          `[hive][${prefix}] Failed to send data (HTTP status ${response.status}): ${response.data}`,
+          `[hive][${prefix}] Failed to send data (HTTP status ${response.status}): ${await response.text()}`,
         );
       }
 
@@ -211,8 +200,7 @@ export function createAgent<TEvent, TResult = void>(
       if (!runOnce) {
         schedule();
       }
-
-      return response.data;
+      return response;
     } catch (error: any) {
       if (!runOnce) {
         schedule();

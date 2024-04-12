@@ -1,10 +1,10 @@
-import axios from 'axios';
 import {
   type execute as ExecuteImplementation,
   type ExecutionResult,
   type GraphQLSchema,
   type subscribe as SubscribeImplementation,
 } from 'graphql';
+import { post } from './internal/http-client.js';
 import { createReporting } from './internal/reporting.js';
 import type { HiveClient, HivePluginOptions } from './internal/types.js';
 import { createUsage } from './internal/usage.js';
@@ -43,6 +43,14 @@ export function createHive(options: HivePluginOptions): HiveClient {
 
   async function info(): Promise<void> {
     if (enabled === false) {
+      return;
+    }
+
+    // enabledOnly when `printTokenInfo` is `true` or `debug` is true and `printTokenInfo` is not `false`
+    const printTokenInfo =
+      options.printTokenInfo === true || (options.debug && options.printTokenInfo !== false);
+
+    if (!printTokenInfo) {
       return;
     }
 
@@ -90,7 +98,7 @@ export function createHive(options: HivePluginOptions): HiveClient {
         }
       `;
 
-      const response = await axios.post(
+      const response = await post(
         endpoint,
         JSON.stringify({
           query,
@@ -105,13 +113,11 @@ export function createHive(options: HivePluginOptions): HiveClient {
             'graphql-client-version': version,
           },
           timeout: 30_000,
-          decompress: true,
-          responseType: 'json',
         },
       );
 
-      if (response.status >= 200 && response.status < 300) {
-        const result: ExecutionResult<any> = await response.data;
+      if (response.ok) {
+        const result: ExecutionResult<any> = await response.json();
 
         if (result.data?.tokenInfo.__typename === 'TokenInfo') {
           const { tokenInfo } = result.data;

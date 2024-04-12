@@ -193,6 +193,11 @@ export type HivePluginOptions = OptionalWhenFalse<
      */
     reporting?: HiveReportingPluginOptions | false;
     /**
+     * Print info about the token.
+     * Disabled by default (enabled by default only in debug mode)
+     */
+    printTokenInfo?: boolean;
+    /**
      * Automatically dispose the client when the process is terminated
      *
      * Apollo: Enabled by default

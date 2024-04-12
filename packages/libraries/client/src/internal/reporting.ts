@@ -49,7 +49,7 @@ export function createReporting(pluginOptions: HivePluginOptions): SchemaReporte
   );
 
   let currentSchema: GraphQLSchema | null = null;
-  const agent = createAgent<GraphQLSchema, ExecutionResult<SchemaPublishMutation>>(
+  const agent = createAgent<GraphQLSchema>(
     {
       logger,
       ...pluginOptions.agent,
@@ -103,11 +103,13 @@ export function createReporting(pluginOptions: HivePluginOptions): SchemaReporte
   return {
     async report({ schema }) {
       try {
-        const result = await agent.sendImmediately(schema);
+        const response = await agent.sendImmediately(schema);
 
-        if (result === null) {
+        if (response === null) {
           throw new Error('Empty response');
         }
+
+        const result: ExecutionResult<SchemaPublishMutation> = await response.json();
 
         if (Array.isArray(result.errors)) {
           throw new Error(result.errors.map(error => error.message).join('\n'));

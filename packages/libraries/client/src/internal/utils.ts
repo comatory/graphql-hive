@@ -1,6 +1,20 @@
 import { hiveClientSymbol } from '../client.js';
 import type { HiveClient, HivePluginOptions } from './types.js';
 
+async function digest(algo: 'SHA-256' | 'SHA-1', output: 'hex' | 'base64', data: string) {
+  if (typeof crypto !== 'undefined' && typeof TextEncoder !== 'undefined') {
+    const buffer = await crypto.subtle.digest(algo, new TextEncoder().encode(data));
+    if (output === 'hex') {
+      return arrayBufferToHEX(buffer);
+    }
+
+    return arrayBufferToBase64(buffer);
+  }
+
+  const { createHash: nodeCreateHash } = await import('crypto');
+  return nodeCreateHash(algo).update(data).digest(output);
+}
+
 function arrayBufferToHEX(buffer: ArrayBuffer) {
   return Array.prototype.map
     .call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2))
@@ -20,12 +34,7 @@ export function createHash(algo: 'SHA-256' | 'SHA-1') {
       return this;
     },
     async digest(output: 'hex' | 'base64') {
-      const buffer = await crypto.subtle.digest(algo, new TextEncoder().encode(str));
-      if (output === 'hex') {
-        return arrayBufferToHEX(buffer);
-      }
-
-      return arrayBufferToBase64(buffer);
+      return digest(algo, output, str);
     },
   };
 }

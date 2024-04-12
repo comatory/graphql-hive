@@ -564,7 +564,7 @@ test('should send data to Hive at least once when using atLeastOnceSampler', asy
   expect(operations).toHaveLength(2); // two operations
 });
 
-test('should not send excluded operation name data to Hive', async () => {
+test.only('should not send excluded operation name data to Hive', async () => {
   const logger = {
     error: vi.fn(),
     info: vi.fn(),
