@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import axios from 'axios';
 import type { DocumentNode } from 'graphql';
 import type { ApolloServerPlugin } from '@apollo/server';
@@ -8,7 +7,7 @@ import type {
   HivePluginOptions,
   SupergraphSDLFetcherOptions,
 } from './internal/types.js';
-import { isHiveClient, joinUrl } from './internal/utils.js';
+import { createHash, isHiveClient, joinUrl } from './internal/utils.js';
 import { version } from './version.js';
 
 export function createSupergraphSDLFetcher(options: SupergraphSDLFetcherOptions) {
@@ -50,11 +49,11 @@ export function createSupergraphSDLFetcher(options: SupergraphSDLFetcherOptions)
         .get(endpoint, {
           headers,
         })
-        .then(response => {
+        .then(async response => {
           if (response.status >= 200 && response.status < 300) {
             const supergraphSdl = response.data;
             const result = {
-              id: createHash('sha256').update(supergraphSdl).digest('base64'),
+              id: await createHash('SHA-256').update(supergraphSdl).digest('base64'),
               supergraphSdl,
             };
 
@@ -175,7 +174,7 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
           },
           willSendResponse(ctx: any) {
             if (!didResolveSource) {
-              complete(args, {
+              void complete(args, {
                 action: 'abort',
                 reason: 'Did not resolve source',
                 logging: false,
@@ -183,7 +182,7 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
               return;
             }
             doc = ctx.document;
-            complete(args, ctx.response);
+            void complete(args, ctx.response);
           },
         } as any;
       }
@@ -195,7 +194,7 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
           },
           async willSendResponse(ctx) {
             if (!didResolveSource) {
-              complete(args, {
+              void complete(args, {
                 action: 'abort',
                 reason: 'Did not resolve source',
                 logging: false,
@@ -205,7 +204,7 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
 
             if (!ctx.document) {
               const details = ctx.operationName ? `operationName: ${ctx.operationName}` : '';
-              complete(args, {
+              void complete(args, {
                 action: 'abort',
                 reason: 'Document is not available' + (details ? ` (${details})` : ''),
                 logging: true,
@@ -214,7 +213,7 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
             }
 
             doc = ctx.document!;
-            complete(args, ctx.response as any);
+            void complete(args, ctx.response as any);
           },
         });
       }
@@ -226,7 +225,7 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
         },
         async willSendResponse(ctx) {
           if (!didResolveSource) {
-            complete(args, {
+            void complete(args, {
               action: 'abort',
               reason: 'Did not resolve source',
               logging: false,
@@ -236,7 +235,7 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
 
           if (!ctx.document) {
             const details = ctx.operationName ? `operationName: ${ctx.operationName}` : '';
-            complete(args, {
+            void complete(args, {
               action: 'abort',
               reason: 'Document is not available' + (details ? ` (${details})` : ''),
               logging: true,
@@ -246,13 +245,13 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
 
           doc = ctx.document;
           if (ctx.response.body.kind === 'incremental') {
-            complete(args, {
+            void complete(args, {
               action: 'abort',
               reason: '@defer and @stream is not supported by Hive',
               logging: true,
             });
           } else {
-            complete(args, ctx.response.body.singleResult);
+            void complete(args, ctx.response.body.singleResult);
           }
         },
       });

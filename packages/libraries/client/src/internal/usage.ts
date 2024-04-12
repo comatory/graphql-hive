@@ -50,7 +50,7 @@ export function createUsage(pluginOptions: HivePluginOptions): UsageCollector {
   if (!pluginOptions.usage || pluginOptions.enabled === false) {
     return {
       collect() {
-        return () => {};
+        return async () => {};
       },
       async dispose() {},
       collectSubscription() {},
@@ -169,7 +169,7 @@ export function createUsage(pluginOptions: HivePluginOptions): UsageCollector {
     collect() {
       const finish = measureDuration();
 
-      return function complete(args, result) {
+      return async function complete(args, result) {
         const duration = finish();
         let providedOperationName: string | undefined = undefined;
         try {
@@ -212,7 +212,11 @@ export function createUsage(pluginOptions: HivePluginOptions): UsageCollector {
               ttl: options.ttl,
               processVariables: options.processVariables ?? false,
             });
-            const { key, value: info } = collect(document, args.variableValues ?? null);
+            const { key, value: infoPromise } = await collect(
+              document,
+              args.variableValues ?? null,
+            );
+            const info = await infoPromise;
             agent.capture({
               type: 'request',
               data: {
@@ -242,7 +246,7 @@ export function createUsage(pluginOptions: HivePluginOptions): UsageCollector {
         }
       };
     },
-    collectSubscription({ args }) {
+    async collectSubscription({ args }) {
       const document = args.document;
       const rootOperation = document.definitions.find(
         o => o.kind === Kind.OPERATION_DEFINITION,
@@ -270,7 +274,9 @@ export function createUsage(pluginOptions: HivePluginOptions): UsageCollector {
           ttl: options.ttl,
           processVariables: options.processVariables ?? false,
         });
-        const { key, value: info } = collect(document, args.variableValues ?? null);
+        const { key, value: infoPromise } = await collect(document, args.variableValues ?? null);
+
+        const info = await infoPromise;
 
         agent.capture({
           type: 'subscription',
@@ -310,12 +316,12 @@ export function createCollector({
 }) {
   const typeInfo = new TypeInfo(schema);
 
-  function collect(
+  async function collect(
     doc: DocumentNode,
     variables: {
       [key: string]: unknown;
     } | null,
-  ): CacheResult {
+  ): Promise<CacheResult> {
     const entries = new Set<string>();
     const collected_entire_named_types = new Set<string>();
     const shouldAnalyzeVariableValues = processVariables === true && variables !== null;
@@ -584,7 +590,7 @@ export function createCollector({
     function cacheKey(doc, variables) {
       return cacheDocumentKey(doc, processVariables === true ? variables : null);
     },
-    LRU<CacheResult>(max, ttl),
+    LRU<Promise<CacheResult>>(max, ttl),
   );
 }
 

@@ -184,7 +184,7 @@ describe('built-in HTTP usage reporting', async () => {
       .post('/usage', body => {
         expect(body.map).toMatchInlineSnapshot(`
         {
-          046386c6981ae292daf3adc123d3b6b0: {
+          e15a9b2c408491a7de1e557f240fd9b97db3972f: {
             fields: [
               Query.hi,
             ],
@@ -296,7 +296,7 @@ describe('built-in HTTP usage reporting', async () => {
       .post('/usage', body => {
         expect(body.map).toMatchInlineSnapshot(`
         {
-          5164dcbb81769931d535efca9e3e8fb5: {
+          7ed6f1c2474785a05302bb92320b793f661d22d8: {
             fields: [
               Mutation.hi,
             ],
@@ -413,7 +413,7 @@ describe('built-in HTTP usage reporting', async () => {
       .post('/usage', body => {
         expect(body.map).toMatchInlineSnapshot(`
           {
-            046386c6981ae292daf3adc123d3b6b0: {
+            e15a9b2c408491a7de1e557f240fd9b97db3972f: {
               fields: [
                 Query.hi,
               ],
@@ -434,7 +434,7 @@ describe('built-in HTTP usage reporting', async () => {
               version: '1',
             },
           },
-          operationMapKey: '046386c6981ae292daf3adc123d3b6b0',
+          operationMapKey: 'e15a9b2c408491a7de1e557f240fd9b97db3972f',
         });
 
         return true;
@@ -551,7 +551,7 @@ describe('built-in HTTP usage reporting', async () => {
       .post('/usage', body => {
         expect(body.map).toMatchInlineSnapshot(`
           {
-            046386c6981ae292daf3adc123d3b6b0: {
+            e15a9b2c408491a7de1e557f240fd9b97db3972f: {
               fields: [
                 Query.hi,
               ],
@@ -567,7 +567,7 @@ describe('built-in HTTP usage reporting', async () => {
               version: '4.2.0',
             },
           },
-          operationMapKey: '046386c6981ae292daf3adc123d3b6b0',
+          operationMapKey: 'e15a9b2c408491a7de1e557f240fd9b97db3972f',
         });
 
         return true;
@@ -686,7 +686,7 @@ describe('graphql-ws usage reporting setup', async () => {
       .post('/usage', body => {
         expect(body.map).toMatchInlineSnapshot(`
           {
-            0063ba7bf2695b896c464057aef29cdc: {
+            f25063b60ab942d0c0d14cdd9cd3172de2e7ebc4: {
               fields: [
                 Query.hi,
               ],
@@ -702,7 +702,7 @@ describe('graphql-ws usage reporting setup', async () => {
               version: '1.0.0',
             },
           },
-          operationMapKey: '0063ba7bf2695b896c464057aef29cdc',
+          operationMapKey: 'f25063b60ab942d0c0d14cdd9cd3172de2e7ebc4',
         });
 
         return true;

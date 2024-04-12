@@ -1,6 +1,34 @@
-import { createHash } from 'node:crypto';
 import { hiveClientSymbol } from '../client.js';
 import type { HiveClient, HivePluginOptions } from './types.js';
+
+function arrayBufferToHEX(buffer: ArrayBuffer) {
+  return Array.prototype.map
+    .call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2))
+    .join('');
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer) as unknown as number[]));
+}
+
+export function createHash(algo: 'SHA-256' | 'SHA-1') {
+  let str: string = '';
+
+  return {
+    update(data: string) {
+      str += data;
+      return this;
+    },
+    async digest(output: 'hex' | 'base64') {
+      const buffer = await crypto.subtle.digest(algo, new TextEncoder().encode(str));
+      if (output === 'hex') {
+        return arrayBufferToHEX(buffer);
+      }
+
+      return arrayBufferToBase64(buffer);
+    },
+  };
+}
 
 export function memo<R, A, K>(fn: (arg: A) => R, cacheKeyFn: (arg: A) => K): (arg: A) => R {
   let memoizedResult: R | null = null;
@@ -19,18 +47,22 @@ export function memo<R, A, K>(fn: (arg: A) => R, cacheKeyFn: (arg: A) => K): (ar
   };
 }
 
+export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
+  return value?.[Symbol.asyncIterator] != null;
+}
+
 export function cache<R, A, K, V>(
   fn: (arg: A, arg2: V) => R,
-  cacheKeyFn: (arg: A, arg2: V) => K,
+  cacheKeyFn: (arg: A, arg2: V) => Promise<K>,
   cacheMap: {
     has(key: K): boolean;
     set(key: K, value: R): void;
     get(key: K): R | undefined;
   },
 ) {
-  return (arg: A, arg2: V) => {
-    const key = cacheKeyFn(arg, arg2);
-    const cachedValue = cacheMap.get(key);
+  return async (arg: A, arg2: V) => {
+    const key = await cacheKeyFn(arg, arg2);
+    const cachedValue = await cacheMap.get(key);
 
     if (cachedValue !== null && typeof cachedValue !== 'undefined') {
       return {
@@ -51,8 +83,8 @@ export function cache<R, A, K, V>(
   };
 }
 
-export function cacheDocumentKey<T, V>(doc: T, variables: V | null) {
-  const hasher = createHash('md5').update(JSON.stringify(doc));
+export async function cacheDocumentKey<T, V>(doc: T, variables: V | null) {
+  const hasher = createHash('SHA-1').update(JSON.stringify(doc));
 
   if (variables) {
     hasher.update(

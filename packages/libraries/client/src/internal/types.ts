@@ -28,7 +28,7 @@ export type AbortAction = {
 export type CollectUsageCallback = (
   args: ExecutionArgs,
   result: GraphQLErrorsResult | AbortAction,
-) => void;
+) => Promise<void>;
 export interface ClientInfo {
   name: string;
   version: string;

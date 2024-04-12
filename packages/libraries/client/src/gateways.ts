@@ -1,7 +1,6 @@
-import { createHash } from 'node:crypto';
 import axios from 'axios';
 import type { SchemaFetcherOptions, ServicesFetcherOptions } from './internal/types.js';
-import { joinUrl } from './internal/utils.js';
+import { createHash, joinUrl } from './internal/utils.js';
 import { version } from './version.js';
 
 interface Schema {
@@ -117,12 +116,11 @@ export function createServicesFetcher(options: ServicesFetcherOptions) {
   const fetcher = createFetcher(options);
 
   return function schemaFetcher() {
-    return fetcher().then(services => {
+    return fetcher().then(async services => {
       if (services instanceof Array) {
-        return services.map(service => ({
-          id: createSchemaId(service),
-          ...service,
-        }));
+        return Promise.all(
+          services.map(service => createSchemaId(service).then(id => ({ id, ...service }))),
+        );
       }
       throw new Error(
         'Encountered a single service instead of a multiple services. Please use createSchemaFetcher instead.',
@@ -132,7 +130,7 @@ export function createServicesFetcher(options: ServicesFetcherOptions) {
 }
 
 const createSchemaId = (service: Schema) =>
-  createHash('sha256')
+  createHash('SHA-256')
     .update(service.sdl)
     .update(service.url || '')
     .update(service.name)
