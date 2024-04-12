@@ -133,7 +133,6 @@ export function createUsage(pluginOptions: HivePluginOptions): UsageCollector {
       },
       headers() {
         return {
-          'Content-Type': 'application/json',
           'graphql-client-name': 'Hive Client',
           'graphql-client-version': version,
           'x-usage-api-version': '2',
