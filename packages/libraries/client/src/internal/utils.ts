@@ -107,9 +107,9 @@ export async function cacheDocumentKey<T, V>(doc: T, variables: V | null) {
 const HR_TO_NS = 1e9;
 const NS_TO_MS = 1e6;
 
-function deltaFrom(hrtime: [number, number]): { ms: number; ns: number } {
-  const delta = process.hrtime(hrtime);
-  const ns = delta[0] * HR_TO_NS + delta[1];
+function deltaFrom(startedAt: number): { ms: number; ns: number } {
+  const endedAt = performance.now();
+  const ns = Math.round(((endedAt - startedAt) * HR_TO_NS) / 1000);
 
   return {
     ns,
@@ -120,7 +120,7 @@ function deltaFrom(hrtime: [number, number]): { ms: number; ns: number } {
 }
 
 export function measureDuration() {
-  const startAt = process.hrtime();
+  const startAt = performance.now();
 
   return function end() {
     return deltaFrom(startAt).ns;
