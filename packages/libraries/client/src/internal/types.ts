@@ -6,7 +6,7 @@ import type { SchemaReporter } from './reporting.js';
 export interface HiveClient {
   [hiveClientSymbol]: true;
   [autoDisposeSymbol]: boolean | NodeJS.Signals[];
-  info(): Promise<void>;
+  info(): void | Promise<void>;
   reportSchema: SchemaReporter['report'];
   /** Collect usage for Query and Mutation operations */
   collectUsage(): CollectUsageCallback;
