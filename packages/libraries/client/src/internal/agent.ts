@@ -137,11 +137,11 @@ export function createAgent<TEvent>(
     return send({ runOnce: true, throwOnError: true });
   }
 
-  async function send<T>(sendOptions: {
+  async function send(sendOptions: {
     runOnce?: boolean;
     throwOnError: true;
   }): Promise<ReadOnlyResponse | null>;
-  async function send<T>(sendOptions: {
+  async function send(sendOptions: {
     runOnce?: boolean;
     throwOnError: false;
   }): Promise<ReadOnlyResponse | null>;
