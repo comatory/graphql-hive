@@ -96,8 +96,25 @@ export function createAgent<TEvent>(
   }
 
   let scheduled = false;
+  let inProgressCaptures: Promise<void>[] = [];
 
-  function capture(event: TEvent) {
+  function capture(event: TEvent | Promise<TEvent>) {
+    if (event instanceof Promise) {
+      const promise = captureAsync(event);
+      inProgressCaptures.push(promise);
+      promise.finally(() => {
+        inProgressCaptures = inProgressCaptures.filter(p => p !== promise);
+      });
+    } else {
+      captureSync(event);
+    }
+  }
+
+  async function captureAsync(event: Promise<TEvent>) {
+    captureSync(await event);
+  }
+
+  function captureSync(event: TEvent) {
     // Calling capture starts the schedule
     if (!scheduled) {
       scheduled = true;
@@ -220,6 +237,10 @@ export function createAgent<TEvent>(
     debugLog('Disposing');
     if (timeoutID) {
       clearTimeout(timeoutID);
+    }
+
+    if (inProgressCaptures.length) {
+      await Promise.all(inProgressCaptures);
     }
 
     await send({

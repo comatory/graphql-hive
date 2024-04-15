@@ -211,33 +211,33 @@ export function createUsage(pluginOptions: HivePluginOptions): UsageCollector {
               ttl: options.ttl,
               processVariables: options.processVariables ?? false,
             });
-            const { key, value: infoPromise } = await collect(
-              document,
-              args.variableValues ?? null,
+
+            agent.capture(
+              collect(document, args.variableValues ?? null).then(({ key, value: info }) => {
+                return {
+                  type: 'request',
+                  data: {
+                    key,
+                    timestamp: Date.now(),
+                    operationName,
+                    operation: info.document,
+                    fields: info.fields,
+                    execution: {
+                      ok: errors.length === 0,
+                      duration,
+                      errorsTotal: errors.length,
+                      errors,
+                    },
+                    // TODO: operationHash is ready to accept hashes of persisted operations
+                    client:
+                      typeof args.contextValue !== 'undefined' &&
+                      typeof options.clientInfo !== 'undefined'
+                        ? options.clientInfo(args.contextValue)
+                        : createDefaultClientInfo()(args.contextValue),
+                  },
+                };
+              }),
             );
-            const info = await infoPromise;
-            agent.capture({
-              type: 'request',
-              data: {
-                key,
-                timestamp: Date.now(),
-                operationName,
-                operation: info.document,
-                fields: info.fields,
-                execution: {
-                  ok: errors.length === 0,
-                  duration,
-                  errorsTotal: errors.length,
-                  errors,
-                },
-                // TODO: operationHash is ready to accept hashes of persisted operations
-                client:
-                  typeof args.contextValue !== 'undefined' &&
-                  typeof options.clientInfo !== 'undefined'
-                    ? options.clientInfo(args.contextValue)
-                    : createDefaultClientInfo()(args.contextValue),
-              },
-            });
           }
         } catch (error) {
           const details = providedOperationName ? ` (name: "${providedOperationName}")` : '';
@@ -273,25 +273,25 @@ export function createUsage(pluginOptions: HivePluginOptions): UsageCollector {
           ttl: options.ttl,
           processVariables: options.processVariables ?? false,
         });
-        const { key, value: infoPromise } = await collect(document, args.variableValues ?? null);
 
-        const info = await infoPromise;
-
-        agent.capture({
-          type: 'subscription',
-          data: {
-            key,
-            timestamp: Date.now(),
-            operationName,
-            operation: info.document,
-            fields: info.fields,
-            // TODO: operationHash is ready to accept hashes of persisted operations
-            client:
-              typeof args.contextValue !== 'undefined' && typeof options.clientInfo !== 'undefined'
-                ? options.clientInfo(args.contextValue)
-                : createDefaultClientInfo()(args.contextValue),
-          },
-        });
+        agent.capture(
+          collect(document, args.variableValues ?? null).then(({ key, value: info }) => ({
+            type: 'subscription',
+            data: {
+              key,
+              timestamp: Date.now(),
+              operationName,
+              operation: info.document,
+              fields: info.fields,
+              // TODO: operationHash is ready to accept hashes of persisted operations
+              client:
+                typeof args.contextValue !== 'undefined' &&
+                typeof options.clientInfo !== 'undefined'
+                  ? options.clientInfo(args.contextValue)
+                  : createDefaultClientInfo()(args.contextValue),
+            },
+          })),
+        );
       }
     },
   };
@@ -315,12 +315,12 @@ export function createCollector({
 }) {
   const typeInfo = new TypeInfo(schema);
 
-  async function collect(
+  function collect(
     doc: DocumentNode,
     variables: {
       [key: string]: unknown;
     } | null,
-  ): Promise<CacheResult> {
+  ): CacheResult {
     const entries = new Set<string>();
     const collected_entire_named_types = new Set<string>();
     const shouldAnalyzeVariableValues = processVariables === true && variables !== null;
@@ -589,7 +589,7 @@ export function createCollector({
     function cacheKey(doc, variables) {
       return cacheDocumentKey(doc, processVariables === true ? variables : null);
     },
-    LRU<Promise<CacheResult>>(max, ttl),
+    LRU<CacheResult>(max, ttl),
   );
 }
 

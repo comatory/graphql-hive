@@ -388,6 +388,7 @@ test('sendImmediately should not stop the schedule', async () => {
   const hive = createHive({
     enabled: true,
     debug: true,
+    printTokenInfo: false,
     agent: {
       timeout: 500,
       maxRetries: 0,
@@ -425,16 +426,22 @@ test('sendImmediately should not stop the schedule', async () => {
   expect(logger.error).not.toHaveBeenCalled();
   expect(logger.info).toHaveBeenCalledWith(`[hive][usage] Sending (queue 1) (attempt 1)`);
   expect(logger.info).toHaveBeenCalledWith(`[hive][usage] Sent!`);
+  // since we sent only 1 element, the buffer was not full,
+  // so we should not see the following log:
   expect(logger.info).not.toHaveBeenCalledWith(`[hive][usage] Sending immediately`);
   expect(logger.info).toHaveBeenCalledTimes(2);
 
-  // Now we will check the maxSize
-  // We run collect three times
+  // Now we will hit the maxSize
+  // We run collect two times
   await Promise.all([collect(args, {}), collect(args, {})]);
+  await waitFor(1);
   expect(logger.error).not.toHaveBeenCalled();
-  expect(logger.info).toHaveBeenCalledWith(`[hive][usage] Sending (queue 1) (attempt 1)`);
+  expect(logger.info).toHaveBeenCalledTimes(4);
+  expect(logger.info).toHaveBeenCalledWith(`[hive][usage] Sending (queue 2) (attempt 1)`);
   expect(logger.info).toHaveBeenCalledWith(`[hive][usage] Sending immediately`);
-  await waitFor(1); // we run setImmediate under the hood
+  //
+  await waitFor(1);
+  // we run setImmediate under the hood
   // It should be sent already
   expect(logger.info).toHaveBeenCalledWith(`[hive][usage] Sent!`);
   expect(logger.info).toHaveBeenCalledTimes(4);
@@ -564,7 +571,7 @@ test('should send data to Hive at least once when using atLeastOnceSampler', asy
   expect(operations).toHaveLength(2); // two operations
 });
 
-test.only('should not send excluded operation name data to Hive', async () => {
+test('should not send excluded operation name data to Hive', async () => {
   const logger = {
     error: vi.fn(),
     info: vi.fn(),

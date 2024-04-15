@@ -474,8 +474,8 @@ importers:
         specifier: 5.2.0
         version: 5.2.0(graphql@16.8.1)
       nock:
-        specifier: 13.5.4
-        version: 13.5.4
+        specifier: 14.0.0-beta.5
+        version: 14.0.0-beta.5
       vitest:
         specifier: 1.5.0
         version: 1.5.0(@types/node@20.12.7)
@@ -26548,15 +26548,12 @@ packages:
       tslib: 2.6.2
     dev: true
 
-  /nock@13.5.4:
-    resolution: {integrity: sha512-yAyTfdeNJGGBFxWdzSKCBYxs5FxLbCg5X5Q4ets974hcQzG1+qCxvIyOo4j2Ry6MUlhWVMX4OoYDefAIIwupjw==}
-    engines: {node: '>= 10.13'}
+  /nock@14.0.0-beta.5:
+    resolution: {integrity: sha512-u255tf4DYvyErTlPZA9uTfXghiZZy+NflUOFONPVKZ5tP0yaHwKig28zyFOLhu8y5YcCRC+V5vDk4HHileh2iw==}
+    engines: {node: '>= 18'}
     dependencies:
-      debug: 4.3.4(supports-color@8.1.1)
       json-stringify-safe: 5.0.1
       propagate: 2.0.1
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /node-abi@3.52.0:

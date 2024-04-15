@@ -55,10 +55,23 @@ async function makeFetchCall(
   try {
     return await responsePromise;
   } catch (error) {
+    if (isAggregateError(error)) {
+      throw new Error(error.errors.map(e => e.message).join(', '), {
+        cause: error,
+      });
+    }
     throw error;
   } finally {
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);
     }
   }
+}
+
+interface AggregateError extends Error {
+  errors: Error[];
+}
+
+function isAggregateError(error: unknown): error is AggregateError {
+  return !!error && typeof error === 'object' && 'errors' in error && Array.isArray(error.errors);
 }
