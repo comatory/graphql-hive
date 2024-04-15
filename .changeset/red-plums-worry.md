@@ -1,5 +1,5 @@
 ---
-"@graphql-hive/client": major
+"@graphql-hive/client": minor
 ---
 
-Requires now Node v16+
+🚨 BREAKING CHANGE 🚨 Requires now Node v16+
