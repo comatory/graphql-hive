@@ -1,6 +1,5 @@
 import { createServer } from 'node:http';
 import { AddressInfo } from 'node:net';
-import axios from 'axios';
 /* eslint-disable-next-line import/no-extraneous-dependencies */
 import { createSchema, createYoga } from 'graphql-yoga';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -81,18 +80,18 @@ test('GraphQL Yoga - should not interrupt the process', async () => {
   await new Promise<void>(resolve => server.listen(0, resolve));
   const port = (server.address() as AddressInfo).port;
 
-  await axios
-    .post(`http://localhost:${port}/graphql`, {
+  await fetch(`http://localhost:${port}/graphql`, {
+    body: JSON.stringify({
       query: /* GraphQL */ `
         {
           hello
         }
       `,
-    })
-    .catch(async error => {
-      await stop();
-      return Promise.reject(error);
-    });
+    }),
+  }).catch(async error => {
+    await stop();
+    return Promise.reject(error);
+  });
 
   await waitFor(5000);
   await stop();

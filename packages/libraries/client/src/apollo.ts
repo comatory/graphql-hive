@@ -240,7 +240,7 @@ export function hiveApollo(clientOrOptions: HiveClient | HivePluginOptions): Apo
               logging: true,
             });
           } else {
-            complete(args, ctx.response.body.singleResult);
+            void complete(args, ctx.response.body.singleResult);
           }
         },
       });

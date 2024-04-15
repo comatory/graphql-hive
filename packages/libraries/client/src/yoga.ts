@@ -149,7 +149,7 @@ export function useHive(clientOrOptions: HiveClient | HivePluginOptions): Plugin
             document = parse(record.paramsArgs.query);
             parsedDocumentCache.set(record.paramsArgs.query, document);
           }
-          record.callback(
+          void record.callback(
             {
               document,
               schema: latestSchema,

@@ -1,6 +1,5 @@
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 import { createServer } from 'node:http';
-import axios from 'axios';
 import { GraphQLError } from 'graphql';
 import { createClient } from 'graphql-ws';
 import { useServer as useWSServer } from 'graphql-ws/lib/use/ws';
@@ -103,9 +102,6 @@ it('reports usage', async ({ expect }) => {
 });
 
 test('reports usage with response cache', async ({ expect }) => {
-  axios.interceptors.request.use(config => {
-    return config;
-  });
   let usageCount = 0;
   const graphqlScope = nock('http://localhost')
     .post('/usage', body => {

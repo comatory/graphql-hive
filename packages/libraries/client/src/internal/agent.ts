@@ -102,7 +102,8 @@ export function createAgent<TEvent>(
     if (event instanceof Promise) {
       const promise = captureAsync(event);
       inProgressCaptures.push(promise);
-      promise.finally(() => {
+      void promise.finally(() => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         inProgressCaptures = inProgressCaptures.filter(p => p !== promise);
       });
     } else {
@@ -144,7 +145,7 @@ export function createAgent<TEvent>(
     runOnce?: boolean;
     throwOnError: false;
   }): Promise<ReadOnlyResponse | null>;
-  async function send<T>(sendOptions?: {
+  async function send(sendOptions?: {
     runOnce?: boolean;
     throwOnError: boolean;
   }): Promise<ReadOnlyResponse | null> {

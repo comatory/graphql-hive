@@ -184,7 +184,7 @@ export function createHive(options: HivePluginOptions): HiveClient {
       if ('then' in result) {
         void result.then(result => collect(args, result));
       } else {
-        collect(args, result);
+        void collect(args, result);
       }
 
       return result;
