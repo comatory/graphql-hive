@@ -1,9 +1,8 @@
 import { hiveClientSymbol } from '../client.js';
 import type { HiveClient, HivePluginOptions } from './types.js';
 
-export const isCloudflareWorker = Boolean(
-  typeof caches !== 'undefined' && 'default' in caches && caches.default,
-);
+export const isCloudflareWorker =
+  typeof caches !== 'undefined' && 'default' in caches && !!caches.default;
 
 async function digest(algo: 'SHA-256' | 'SHA-1', output: 'hex' | 'base64', data: string) {
   if (typeof crypto !== 'undefined' && typeof TextEncoder !== 'undefined') {

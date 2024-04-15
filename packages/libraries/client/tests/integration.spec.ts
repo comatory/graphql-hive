@@ -1,5 +1,3 @@
-import { createServer } from 'node:http';
-import { AddressInfo } from 'node:net';
 /* eslint-disable-next-line import/no-extraneous-dependencies */
 import { createSchema, createYoga } from 'graphql-yoga';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -46,18 +44,18 @@ test('GraphQL Yoga - should not interrupt the process', async () => {
     debug: true,
     token: 'my-token',
     agent: {
-      maxRetries: 2,
+      maxRetries: 1,
       sendInterval: 1000,
-      timeout: 1000,
+      timeout: 50,
       logger,
     },
     reporting: {
-      endpoint: 'http://404.localhost/registry',
+      endpoint: 'http://404graphql.localhost/registry',
       author: 'jest',
       commit: 'js',
     },
     usage: {
-      endpoint: 'http://404.localhost/usage',
+      endpoint: 'http://404usage.localhost/usage',
     },
   });
 
@@ -66,40 +64,28 @@ test('GraphQL Yoga - should not interrupt the process', async () => {
       typeDefs,
       resolvers,
     }),
-    plugins: [useHive(hive) as any],
+    plugins: [useHive(hive)],
     logging: false,
   });
 
-  const server = createServer(yoga);
-
   async function stop() {
-    await new Promise(resolve => server.close(resolve));
     await hive.dispose();
   }
 
-  await new Promise<void>(resolve => server.listen(0, resolve));
-  const port = (server.address() as AddressInfo).port;
+  await Promise.resolve(yoga.fetch(new Request(`http://localhost/graphql?query={hello}`))).catch(
+    async error => {
+      await stop();
+      return Promise.reject(error);
+    },
+  );
 
-  await fetch(`http://localhost:${port}/graphql`, {
-    body: JSON.stringify({
-      query: /* GraphQL */ `
-        {
-          hello
-        }
-      `,
-    }),
-  }).catch(async error => {
-    await stop();
-    return Promise.reject(error);
-  });
-
-  await waitFor(5000);
+  await waitFor(100);
   await stop();
   expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[hive][info]'));
   expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[hive][usage]'));
   expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[hive][reporting]'));
   clean();
-}, 10_000);
+}, 2_000);
 
 test('Apollo Server - should not interrupt the process', async () => {
   const logger = {
@@ -116,9 +102,9 @@ test('Apollo Server - should not interrupt the process', async () => {
         debug: true,
         token: 'my-token',
         agent: {
-          maxRetries: 2,
+          maxRetries: 1,
           sendInterval: 1000,
-          timeout: 1000,
+          timeout: 50,
           logger,
         },
         reporting: {
@@ -140,10 +126,10 @@ test('Apollo Server - should not interrupt the process', async () => {
       }
     `,
   });
-  await waitFor(5000);
+  await waitFor(100);
   await apollo.stop();
   clean();
   expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[hive][info]'));
   expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[hive][usage]'));
   expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[hive][reporting]'));
-}, 10_000);
+}, 2_000);
