@@ -490,6 +490,7 @@ test('should send data to Hive at least once when using atLeastOnceSampler', asy
   const hive = createHive({
     enabled: true,
     debug: true,
+    printTokenInfo: false,
     agent: {
       timeout: 500,
       maxRetries: 0,
