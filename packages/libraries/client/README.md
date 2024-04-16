@@ -56,20 +56,20 @@ If you're using Cloudflare Workers, you can use the following code:
 import { useYogaHive, createYogaHive, useYogaHive } from '@graphql-hive/client'
 import { createYoga } from 'graphql-yoga'
 
-const hive = createYogaHive({
-  enabled: true, // Enable/Disable Hive Client
-  token: 'YOUR-TOKEN',
-  usage: true // Collects schema usage based on operations
-});
-
-const yoga = createYoga({
-  plugins: [
-    useYogaHive(hive)
-  ]
-})
-
 export default {
   async fetch(request, env, ctx) {
+    const hive = createYogaHive({
+      enabled: true, // Enable/Disable Hive Client
+      token: 'YOUR-TOKEN',
+      usage: true // Collects schema usage based on operations
+    });
+    
+    const yoga = createYoga({
+      plugins: [
+        useYogaHive(hive)
+      ]
+    });
+
     const response = await yoga.fetch(request, env, ctx);
     ctx.waitUntil(hive.dispose());
     return response;
