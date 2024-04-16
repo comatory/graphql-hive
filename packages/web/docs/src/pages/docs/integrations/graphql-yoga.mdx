@@ -84,13 +84,13 @@ export default {
       token: 'YOUR-TOKEN',
       usage: true // Collects schema usage based on operations
     });
-    
+
     const yoga = createYoga({
       plugins: [
         useYogaHive(hive)
       ]
     });
-    
+
     const response = await yoga.fetch(request, env, ctx);
     ctx.waitUntil(hive.dispose());
     return response;

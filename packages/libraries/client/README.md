@@ -63,7 +63,7 @@ export default {
       token: 'YOUR-TOKEN',
       usage: true // Collects schema usage based on operations
     });
-    
+
     const yoga = createYoga({
       plugins: [
         useYogaHive(hive)
