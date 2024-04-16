@@ -1046,8 +1046,8 @@ importers:
         specifier: 6.3.0
         version: 6.3.0(@envelop/core@5.0.0)(graphql@16.8.1)
       '@envelop/sentry':
-        specifier: 7.1.1
-        version: 7.1.1(@envelop/core@5.0.0)(@sentry/node@7.110.1)(graphql@16.8.1)
+        specifier: 9.0.0
+        version: 9.0.0(@envelop/core@5.0.0)(@sentry/node@7.110.1)(graphql@16.8.1)
       '@envelop/types':
         specifier: 5.0.0
         version: 5.0.0
@@ -5012,8 +5012,8 @@ packages:
       tslib: 2.6.2
     dev: true
 
-  /@envelop/sentry@7.1.1(@envelop/core@5.0.0)(@sentry/node@7.110.1)(graphql@16.8.1):
-    resolution: {integrity: sha512-dNq56ZaMQSj7U9czMSdcL+HqBuJVTTYyzLrX2nBRukohdI+kvDi+ptfpfAKtOXT+1fuKTlzvLupXDMMVjPbB8Q==}
+  /@envelop/sentry@9.0.0(@envelop/core@5.0.0)(@sentry/node@7.110.1)(graphql@16.8.1):
+    resolution: {integrity: sha512-R1qgYKOiaDGc1MXRfJCzNs8z5lVuRK3liHquwR72HxawgXP2wEPzTJgqMo1M7s7pZEHgf2RvO6mYAUExbZNYlg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@envelop/core': ^5.0.0
