@@ -201,10 +201,10 @@ importers:
         version: 4.10.0(ts-node@10.9.2)(typescript@5.4.5)
       '@pulumi/kubernetesx':
         specifier: 0.1.6
-        version: 0.1.6(@pulumi/kubernetes@4.10.0)(@pulumi/pulumi@3.113.0)
+        version: 0.1.6(@pulumi/kubernetes@4.10.0)(@pulumi/pulumi@3.113.3)
       '@pulumi/pulumi':
-        specifier: 3.113.0
-        version: 3.113.0(ts-node@10.9.2)(typescript@5.4.5)
+        specifier: 3.113.3
+        version: 3.113.3(ts-node@10.9.2)(typescript@5.4.5)
       '@pulumi/random':
         specifier: 4.16.0
         version: 4.16.0(ts-node@10.9.2)(typescript@5.4.5)
@@ -7739,7 +7739,7 @@ packages:
     resolution: {integrity: sha512-REc/LQOy17O9jbZnBNm4tLjLJKxOfLaWPIB2CFiAtM1VzwU3FzZQFs0K+XGkuZwWdB+tl2/VHdHv+FqsUrit2w==}
     requiresBuild: true
     dependencies:
-      '@pulumi/pulumi': 3.113.0(ts-node@10.9.2)(typescript@5.4.5)
+      '@pulumi/pulumi': 3.113.3(ts-node@10.9.2)(typescript@5.4.5)
     transitivePeerDependencies:
       - bluebird
       - supports-color
@@ -10165,7 +10165,7 @@ packages:
     resolution: {integrity: sha512-cwdB70bLeKL/VNIqqOD5fpHQcocVmpHuiHH589eR+QUfbLa4f+M8yA/TTCcxx2AFFctTqO5wgVuC+faL8xZmWQ==}
     requiresBuild: true
     dependencies:
-      '@pulumi/pulumi': 3.113.0(ts-node@10.9.2)(typescript@5.4.5)
+      '@pulumi/pulumi': 3.113.3(ts-node@10.9.2)(typescript@5.4.5)
     transitivePeerDependencies:
       - bluebird
       - supports-color
@@ -10177,7 +10177,7 @@ packages:
     resolution: {integrity: sha512-CPgZIU7JOSwt9nT+8UbzZluyhwCoWHAPLyvNtaCiDxyn0b9p4fxsB2WgV2qIqtsptYUnV4vtAf/9SQdMcQE44g==}
     requiresBuild: true
     dependencies:
-      '@pulumi/pulumi': 3.113.0(ts-node@10.9.2)(typescript@5.4.5)
+      '@pulumi/pulumi': 3.113.3(ts-node@10.9.2)(typescript@5.4.5)
       '@types/node-fetch': 2.6.4
       '@types/tmp': 0.0.33
       glob: 10.3.10
@@ -10192,18 +10192,18 @@ packages:
       - typescript
     dev: false
 
-  /@pulumi/kubernetesx@0.1.6(@pulumi/kubernetes@4.10.0)(@pulumi/pulumi@3.113.0):
+  /@pulumi/kubernetesx@0.1.6(@pulumi/kubernetes@4.10.0)(@pulumi/pulumi@3.113.3):
     resolution: {integrity: sha512-9VL4Yi4b4aLC/obBarJuNkm86kABByUZICYPSTdV396MGZtOc066o2brsB+kWVQcVfkYVXTPrpjIkAwBXXnzGw==}
     peerDependencies:
       '@pulumi/kubernetes': ^3.0.0
       '@pulumi/pulumi': ^3.0.0
     dependencies:
       '@pulumi/kubernetes': 4.10.0(ts-node@10.9.2)(typescript@5.4.5)
-      '@pulumi/pulumi': 3.113.0(ts-node@10.9.2)(typescript@5.4.5)
+      '@pulumi/pulumi': 3.113.3(ts-node@10.9.2)(typescript@5.4.5)
     dev: false
 
-  /@pulumi/pulumi@3.113.0(ts-node@10.9.2)(typescript@5.4.5):
-    resolution: {integrity: sha512-egkifOLTGIQmyN0BFbMBBYKTqKy2a5UE5a4DKOT51S6GrdGas6M4yvXVksjL2gcaKiKIYOQSsaonvwc8/hkvpQ==}
+  /@pulumi/pulumi@3.113.3(ts-node@10.9.2)(typescript@5.4.5):
+    resolution: {integrity: sha512-q7Agc4nkIKNuoOmzIvmvbH3axIkdhEbVA+GPlosRM0MUJkJdRlU82hO4EGBhkyGbBPbLWvirqCjXOAQ66LgCfg==}
     engines: {node: '>=18'}
     peerDependencies:
       ts-node: '>= 7.0.1 < 12'
@@ -10258,7 +10258,7 @@ packages:
   /@pulumi/random@4.16.0(ts-node@10.9.2)(typescript@5.4.5):
     resolution: {integrity: sha512-cHwlhy/+xTWCt7gwlJoG0q1l234YLxWtSWI61MzekWSsthbtcYruXo2bUlgcXWX5V4/lHjvQG84l5n1aTNZJoA==}
     dependencies:
-      '@pulumi/pulumi': 3.113.0(ts-node@10.9.2)(typescript@5.4.5)
+      '@pulumi/pulumi': 3.113.3(ts-node@10.9.2)(typescript@5.4.5)
     transitivePeerDependencies:
       - bluebird
       - supports-color
